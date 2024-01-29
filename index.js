@@ -1,5 +1,6 @@
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
+const { access } = require("fs");
 const { URLSearchParams } = require("url");
 const Buffer = require("buffer").Buffer;
 
@@ -37,7 +38,6 @@ async function getAccessToken() {
   }
 }
 
-// Function to get track data using the access token
 async function getTrack(trackId, accessToken) {
   const response = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
     method: "GET",
@@ -55,14 +55,34 @@ async function getTrack(trackId, accessToken) {
   }
 }
 
+async function getProfile(accessToken) {
+  const response = await fetch("https://api.spotify.com/v1/me", {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    console.log("Profile Data:", data);
+    return data; // Return the user profile data
+  } else {
+    const errorData = await response.json();
+    console.error("Failed to retrieve profile data:", errorData);
+    return null; // Return null in case of failure
+  }
+}
+
 // Main function to orchestrate getting the access token and fetching track data
 async function main() {
   const accessToken = await getAccessToken();
   if (accessToken) {
-    // Example track ID: '11dFghVXANMlKmJXsNCbNl' (This is "Could You Be Loved" by Bob Marley)
     await getTrack("11dFghVXANMlKmJXsNCbNl", accessToken);
+
+    // Fetch and log profile data
+    const profileData = await getProfile(accessToken);
+    console.log("Fetched Profile Data:", profileData);
   }
 }
 
-// Run the main function
 main();
