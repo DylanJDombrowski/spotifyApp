@@ -1,6 +1,7 @@
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 const { access } = require("fs");
+const { get } = require("http");
 const { URLSearchParams } = require("url");
 const Buffer = require("buffer").Buffer;
 
@@ -37,6 +38,8 @@ async function getAccessToken() {
     return null; // Return null in case of failure
   }
 }
+
+getAccessToken();
 
 async function getTrack(trackId, accessToken) {
   const response = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
